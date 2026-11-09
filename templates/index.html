@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telhado Solar Comunitário</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="header">
+    <h1>☀️ Telhado Solar Comunitário</h1>
+    <p>Descubra quanto você pode economizar com energia solar e como sua comunidade pode se unir para tornar isso realidade.</p>
+    <div class="ods-badges">
+        <span class="ods-badge">ODS 13 — Ação Climática</span>
+        <span class="ods-badge">ODS 11 — Cidades Sustentáveis</span>
+        <span class="ods-badge">ODS 10 — Menos Desigualdade</span>
+    </div>
+</header>
+
+<!-- ===================== CONTEÚDO PRINCIPAL ===================== -->
+<main class="container">
+
+    <div class="grid">
+
+        <!-- COLUNA ESQUERDA: Formulário -->
+        <div class="card">
+            <h2>📋 Seus Dados</h2>
+
+            <div class="form-group">
+                <label for="cidade">Cidade</label>
+                <input type="text" id="cidade" placeholder="Ex: São Paulo" maxlength="100">
+            </div>
+
+            <div class="form-group">
+                <label for="estado">Estado</label>
+                <select id="estado">
+                    <option value="">Selecione...</option>
+                    <option value="AC">AC</option><option value="AL">AL</option>
+                    <option value="AM">AM</option><option value="AP">AP</option>
+                    <option value="BA">BA</option><option value="CE">CE</option>
+                    <option value="DF">DF</option><option value="ES">ES</option>
+                    <option value="GO">GO</option><option value="MA">MA</option>
+                    <option value="MG">MG</option><option value="MS">MS</option>
+                    <option value="MT">MT</option><option value="PA">PA</option>
+                    <option value="PB">PB</option><option value="PE">PE</option>
+                    <option value="PI">PI</option><option value="PR">PR</option>
+                    <option value="RJ">RJ</option><option value="RN">RN</option>
+                    <option value="RO">RO</option><option value="RR">RR</option>
+                    <option value="RS">RS</option><option value="SC">SC</option>
+                    <option value="SE">SE</option><option value="SP">SP</option>
+                    <option value="TO">TO</option>
+                </select>
+            </div>
+
+            <!-- Slider do valor da conta -->
+            <div class="form-group">
+                <label>Média da conta de luz por casa (R$/mês)</label>
+                <div class="slider-container">
+                    <input type="range" id="valorConta" min="50" max="500" value="200" step="10">
+                    <div class="slider-value">R$ <span id="valorContaDisplay">200</span></div>
+                </div>
+            </div>
+
+            <!-- Slider de moradores (cooperativa) -->
+            <div class="form-group">
+                <label>Moradores na cooperativa</label>
+                <small>Quantos vizinhos entrariam juntos?</small>
+                <div class="slider-container">
+                    <input type="range" id="numMoradores" min="1" max="50" value="1" step="1">
+                    <div class="slider-value"><span id="numMoradoresDisplay">1</span> morador(es)</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnCalcular" onclick="calcular()">
+                ⚡ Calcular Economia
+            </button>
+        </div>
+
+        <!-- COLUNA DIREITA: Casinha SVG -->
+        <div class="card">
+            <h2>🏠 Vista Aérea — Sua Casa Solar</h2>
+            <div class="house-container" id="houseContainer" style="min-height: 320px;">
+                <!-- SVG aérea gerado pelo JS -->
+            </div>
+            <p id="placasInfo" style="text-align:center; color: var(--cinza-400); font-size: 0.85rem; font-weight: 500;">
+                Ajuste os valores ao lado para ver as placas!
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Consultando dados de irradiação solar da sua região...</p>
+    </div>
+
+    <!-- ===================== RESULTADOS ===================== -->
+    <div class="resultados" id="resultados">
+        <div class="card fade-in">
+            <h2>📊 Resultado da Simulação</h2>
+
+            <!-- Dados da região -->
+            <div class="resultado-section">
+                <h3>📍 Dados da Região</h3>
+                <div class="resultado-grid">
+                    <div class="resultado-item">
+                        <div class="valor" id="resTarifa">-</div>
+                        <div class="rotulo">Tarifa (R$/kWh)</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resIrradiacao">-</div>
+                        <div class="rotulo">Irradiação solar (kWh/m²/dia)</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resConsumo">-</div>
+                        <div class="rotulo">Consumo estimado por casa</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resProducao">-</div>
+                        <div class="rotulo">Produção solar por casa</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Economia por casa -->
+            <div class="resultado-section">
+                <h3>💰 Economia por Casa</h3>
+                <div class="resultado-grid">
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resEconomia">-</div>
+                        <div class="rotulo">Economia mensal</div>
+                    </div>
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resPercentual">-</div>
+                        <div class="rotulo">Da conta coberta pelo sol</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sistema solar -->
+            <div class="resultado-section">
+                <h3>☀️ Sistema Solar</h3>
+                <div class="resultado-grid">
+                    <div class="resultado-item">
+                        <div class="valor" id="resPlacas">-</div>
+                        <div class="rotulo">Placas totais na cooperativa</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resPlacasCasa">-</div>
+                        <div class="rotulo">Placas por telhado</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resCusto">-</div>
+                        <div class="rotulo">Custo total do sistema</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resMoradores">-</div>
+                        <div class="rotulo">Casas na cooperativa</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investimento por casa -->
+            <div class="resultado-section">
+                <h3>🏠 Investimento por Casa</h3>
+                <div class="resultado-grid">
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resCustoPessoa">-</div>
+                        <div class="rotulo">Investimento por casa (à vista)</div>
+                    </div>
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resParcela">-</div>
+                        <div class="rotulo">Parcela mensal (60x, juros 1,2%/mês)</div>
+                    </div>
+                    <div class="resultado-item">
+                        <div class="valor" id="resRetorno">-</div>
+                        <div class="rotulo">Retorno do investimento (à vista)</div>
+                    </div>
+                </div>
+
+                <!-- Detalhamento do saldo mensal -->
+                <div class="saldo-detalhe" id="saldoDetalhe">
+                    <h4>📋 Saldo Mensal Detalhado (se financiar em 60x)</h4>
+                    <div class="saldo-calculo">
+                        <div class="saldo-linha">
+                            <span>Economia mensal com solar</span>
+                            <span class="saldo-valor positivo" id="saldoEconomia">+ R$ 0,00</span>
+                        </div>
+                        <div class="saldo-linha">
+                            <span>Parcela do financiamento</span>
+                            <span class="saldo-valor negativo" id="saldoParcela">- R$ 0,00</span>
+                        </div>
+                        <div class="saldo-linha saldo-total">
+                            <span>Saldo por mês no seu bolso</span>
+                            <span class="saldo-valor" id="saldoFinal">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <p class="saldo-veredicto" id="saldoVeredicto"></p>
+                </div>
+            </div>
+
+            <!-- Comparativo de prazos de financiamento -->
+            <div class="resultado-section" id="secaoFinanciamento">
+                <h3>📊 Compare os Prazos de Financiamento</h3>
+                <div class="tabela-financiamento" id="tabelaFinanciamento">
+                    <!-- Preenchido pelo JS -->
+                </div>
+            </div>
+
+            <!-- Projeção 25 anos -->
+            <div class="resultado-section projecao-section" id="secaoProjecao">
+                <h3>🔮 Projeção em 25 Anos (vida útil das placas)</h3>
+                <div class="resultado-grid">
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resEconomia25">-</div>
+                        <div class="rotulo">Economia total em 25 anos</div>
+                    </div>
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resLucroVista">-</div>
+                        <div class="rotulo">Lucro líquido (à vista)</div>
+                    </div>
+                    <div class="resultado-item destaque">
+                        <div class="valor" id="resLucroFinanciado">-</div>
+                        <div class="rotulo">Lucro líquido (financiado 60x)</div>
+                    </div>
+                </div>
+                <p class="projecao-nota" id="projecaoNota"></p>
+            </div>
+
+            <!-- Botão salvar -->
+            <button class="btn btn-save" onclick="salvar()">
+                💾 Salvar Simulação
+            </button>
+
+            <!-- Relatório LLM -->
+            <div id="relatorioContainer" style="display:none; margin-top:1rem;">
+                <h3>📝 Relatório Explicativo</h3>
+                <div class="relatorio-box" id="relatorioTexto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== HISTÓRICO ===================== -->
+    <div class="card" style="margin-top:1.5rem;">
+        <h2>📜 Simulações Salvas</h2>
+        <div id="historicoContainer">
+            <p style="color: var(--cinza-400); text-align:center; padding: 1.5rem 0; font-size: 0.9rem;">Nenhuma simulação salva ainda.</p>
+        </div>
+    </div>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+    <p>Telhado Solar Comunitário — Global Solution CitizenTech — FIAP 2026</p>
+    <p>Dados de irradiação solar: <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a> | Tarifas: ANEEL</p>
+</footer>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

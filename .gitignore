@@ -1,0 +1,20 @@
+# Ambiente
+.env
+venv/
+__pycache__/
+*.pyc
+
+# Logs
+logs/*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups e imagens de referência
+static/js/*_backup.js
+aaa.png
